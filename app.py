@@ -89,9 +89,14 @@ def analyze_srs():
     pdf_file = request.files['file']
     mode = request.form['mode']
 
-    # Save the uploaded PDF to process
-    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file.filename) 
-    pdf_file.save(pdf_path)
+    # Path to save the uploaded PDF
+    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file.filename)
+
+    # Save the file to the specified path
+    try:
+        pdf_file.save(pdf_path)
+    except Exception as e:
+        return jsonify({"error": f"Could not save file: {str(e)}"}), 500
 
     # Extract text from PDF
     text = extract_text_from_pdf(pdf_path)
