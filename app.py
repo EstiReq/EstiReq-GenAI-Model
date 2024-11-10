@@ -11,7 +11,10 @@ genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = './srs.pdf'
+app.config['UPLOAD_FOLDER'] = './uploads'
+
+# Ensure the upload folder exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 
 # Function to extract text from a PDF document
