@@ -11,7 +11,7 @@ genai.configure(api_key=API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = './uploads'
+app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
