@@ -90,7 +90,7 @@ def analyze_srs():
     mode = request.form['mode']
 
     # Save the uploaded PDF to process
-    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file.filename)
+    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file.filename) 
     pdf_file.save(pdf_path)
 
     # Extract text from PDF
