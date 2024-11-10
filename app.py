@@ -10,7 +10,8 @@ genai.configure(api_key="******")
 model = genai.GenerativeModel('gemini-pro')
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = 'srs.pdf'
+app.config['UPLOAD_FOLDER'] = './srs.pdf'
+
 
 # Function to extract text from a PDF document
 def extract_text_from_pdf(pdf_path):
@@ -71,6 +72,10 @@ def further_clean_text(text):
     text = re.sub(r'5\.\d+.*Requirements.*', '', text)
     return text.strip()
 
+@app.route('/')
+def hello():
+    return "Hello World!"
+
 # Route to handle PDF file upload and analysis
 @app.route('/analyze', methods=['POST'])
 def analyze_srs():
@@ -102,5 +107,8 @@ def analyze_srs():
     return jsonify(results)
 
 # Run the Flask app
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    port = os.environ.get('FLASK_PORT') or 8080
+    port = int(port)
+
+    app.run(port=port,host='0.0.0.0')
