@@ -4,8 +4,9 @@ import PyPDF2
 import re
 import os
 
+API_KEY = os.environ.get('API_KEY')
 
-genai.configure(api_key="******")
+genai.configure(api_key=API_KEY)
 
 model = genai.GenerativeModel('gemini-pro')
 
