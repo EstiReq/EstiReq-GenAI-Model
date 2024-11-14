@@ -25,10 +25,10 @@ In current software development processes, team leaders often face challenges in
 
 Challenges:
 
-    Slow Time Estimates: Estimating how long tasks will take is a time-consuming process, which can delay the project.
-    Unclear Instructions: It’s difficult to quickly create clear and actionable steps for developers, leading to confusion and mistakes.
-    Changing Requirements: New tasks or changes often come up suddenly, making it hard to keep everything organized and on schedule.
-    Less Focus on Development: A lot of time is spent on planning and estimating, leaving less time for the actual work.
+1. Slow Time Estimates: Estimating how long tasks will take is a time-consuming process, which can delay the project.
+2. Unclear Instructions: It’s difficult to quickly create clear and actionable steps for developers, leading to confusion and mistakes.
+3. Changing Requirements: New tasks or changes often come up suddenly, making it hard to keep everything organized and on schedule.
+4. Less Focus on Development: A lot of time is spent on planning and estimating, leaving less time for the actual work.
 
 This project aims to solve these problems by using AI to quickly estimate time and generate clear instructions, allowing teams to focus more on development and stay on track.
 
