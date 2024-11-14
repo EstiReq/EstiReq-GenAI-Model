@@ -1,23 +1,27 @@
+import os
 from flask import Flask, request, jsonify
 import google.generativeai as genai
 import PyPDF2
 import re
-import os
+from langchain.vectorstores import FAISS
+from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain.docstore.document import Document
 
 API_KEY = os.environ.get('API_KEY')
+OPEN_API_KEY = os.environ.get('OPEN_API_KEY')
 print(API_KEY)
+print(OPEN_API_KEY)
 genai.configure(api_key=API_KEY)
-
 model = genai.GenerativeModel('gemini-pro')
 
+# Initialize Flask app
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = '/tmp/uploads'
 
 # Ensure the upload folder exists
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-
-# Function to extract text from a PDF document
+# Function to extract text from PDF
 def extract_text_from_pdf(pdf_path):
     with open(pdf_path, 'rb') as pdf_file:
         pdf_reader = PyPDF2.PdfReader(pdf_file)
@@ -37,30 +41,28 @@ def parse_user_stories(text):
         user_stories[story_id] = story_text
     return user_stories
 
-# Function to generate either an effort estimate or Node.js implementation guide
-def generate_response(user_story, mode="estimate"):
-    if mode == "estimate":
-        prompt = f"Estimate the development effort in hours required for the following user story:\n\n{user_story}"
-    elif mode == "guide":
-        prompt = f"""
-        Provide a detailed guide on how to implement the following user story as a backend service using Node.js:
+# Initialize FAISS VectorStore and load documents
+def initialize_faiss(user_stories):
+    documents = [Document(page_content=story, metadata={"id": story_id}) for story_id, story in user_stories.items()]  
+    embeddings = OpenAIEmbeddings(openai_api_key="OPEN_API_KEY")
+    vectorstore = FAISS.from_documents(documents, embeddings)
+    return vectorstore
 
-        User Story: '{user_story}'
+# Generate response with RAG (Retrieve and Generate)
+def estimate_effort(user_story, vectorstore):
+    relevant_docs = vectorstore.similarity_search(user_story, k=3)
+    relevant_info = "\n".join([doc.page_content for doc in relevant_docs]) if relevant_docs else "No additional context found."
 
-        Include specific instructions on:
-        1. Necessary route endpoints and HTTP methods.
-        2. Sample code snippets for Express routes and middleware.
-        3. Recommended data schema using MongoDB and Mongoose.
-        4. Steps for user authentication or authorization if required.
-        5. Any other relevant backend logic.
-        """
-    else:
-        raise ValueError("Mode should be either 'estimate' or 'guide'")
-
+    prompt = (
+        f"Estimate the development effort in hours required for the following user story:\n\n"
+        f"'{user_story}'\n\n"
+        f"Additional Information:\n{relevant_info}\n\n"
+        f"Please consider factors like complexity, implementation, and testing."
+    )
     response = model.generate_content(prompt)
     return response.text.strip()
 
-# Clean up the extracted text
+# Function to clean the extracted user stories text
 def clean_text(text):
     text = re.sub(r'\uf095', '', text)
     text = re.sub(r'-\s+', '', text)
@@ -68,7 +70,7 @@ def clean_text(text):
     text = re.sub(r'\s([?.!,"])', r'\1', text)
     return text.strip()
 
-# Further cleaning for extraneous sections
+# Further refine the cleaned text
 def further_clean_text(text):
     text = re.sub(r'\b(\w+)\s*-\s*(\w+)\b', r'\1\2', text)
     text = re.sub(r'3\.\d+.*Requirements.*', '', text)
@@ -76,11 +78,28 @@ def further_clean_text(text):
     text = re.sub(r'5\.\d+.*Requirements.*', '', text)
     return text.strip()
 
-@app.route('/')
-def hello():
-    return "Hello World!"
+# Generate backend guide for user story
+def generate_backend_guide(user_story, vectorstore):
+    relevant_docs = vectorstore.similarity_search(user_story, k=3)
+    relevant_info = "\n".join([doc.page_content for doc in relevant_docs])
 
-# Route to handle PDF file upload and analysis
+    prompt = (
+        f"Provide a detailed guide on how to implement the following user story as a backend service "
+        f"using Node.js:\n\n"
+        f"User Story: '{user_story}'\n\n"
+        f"Additional Context:\n{relevant_info}\n\n"
+        f"The guide should include:\n"
+        f"- Setting up the Node.js project (e.g., folder structure, dependencies).\n"
+        f"- Implementing key service functions (e.g., handling requests, interacting with databases).\n"
+        f"- Best practices (e.g., error handling, security, performance optimization).\n"
+        f"- Sample code snippets for illustration.\n"
+    )
+
+    # Generate the response
+    response = model.generate_content(prompt)
+    return response.text.strip()
+
+# Flask route to handle PDF file upload and analysis
 @app.route('/analyze', methods=['POST'])
 def analyze_srs():
     if 'file' not in request.files or 'mode' not in request.form:
@@ -89,10 +108,11 @@ def analyze_srs():
     pdf_file = request.files['file']
     mode = request.form['mode']
 
-    # Path to save the uploaded PDF
-    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file.filename)
+    if mode not in ["estimate", "guide"]:
+        return jsonify({"error": "Invalid mode. Please choose 'estimate' or 'guide'."}), 400
 
-    # Save the file to the specified path
+    # Save the uploaded PDF file
+    pdf_path = os.path.join(app.config['UPLOAD_FOLDER'], pdf_file.filename)
     try:
         pdf_file.save(pdf_path)
     except Exception as e:
@@ -106,18 +126,27 @@ def analyze_srs():
     cleaned_user_stories = {story_id: clean_text(story_text) for story_id, story_text in user_stories.items()}
     final_user_stories = {story_id: further_clean_text(story_text) for story_id, story_text in cleaned_user_stories.items()}
 
-    # Generate responses for each user story
+    # Initialize FAISS vector store
+    vectorstore = initialize_faiss(final_user_stories)
+
+    # Generate responses based on the selected mode
     results = {}
-    for story_id, story_text in final_user_stories.items():
-        response = generate_response(story_text, mode=mode)
-        results[story_id] = response
+    if mode == "estimate":
+        for story_id, story_text in final_user_stories.items():
+            try:
+                results[story_id] = estimate_effort(story_text, vectorstore)
+            except Exception as e:
+                results[story_id] = f"Error estimating effort: {str(e)}"
+    elif mode == "guide":
+        for story_id, story_text in final_user_stories.items():
+            try:
+                results[story_id] = generate_backend_guide(story_text, vectorstore)
+            except Exception as e:
+                results[story_id] = f"Error generating guide: {str(e)}"
 
     # Return results as JSON
     return jsonify(results)
 
 # Run the Flask app
 if __name__ == '__main__':
-    port = os.environ.get('FLASK_PORT') or 8080
-    port = int(port)
-
-    app.run(port=port,host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0', port=5000)
