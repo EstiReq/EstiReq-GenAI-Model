@@ -1,4 +1,7 @@
 Flask>=2.2
 google-generativeai
+langchain
+langchain-community
 PyPDF2
+tiktoken
 
