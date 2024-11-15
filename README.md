@@ -34,7 +34,7 @@ The idea is to create an AI-powered tool that provides quick time estimates and 
 
 ## Demo video
 
-[![Watch the video](./uploads/logo.png)](https://youtube.com/clip/Ugkxl2OrCbpKrbdCJPHYMxnp1SlrmlniqvsL?si=mmtPGJMkSWxDw6re)
+[![Watch the video](https://youtu.be/eLPZmtRdo8k)
 
 1. Analyzes project requirements (user stories).
 2. Compares them with similar past tasks.
