@@ -47,6 +47,10 @@ https://www.youtube.com/watch?v=M6QRExVh4BM
 
 The future scope of the solution includes enhancing AI models for more accurate task estimation and analysis, enabling automated task prioritization to help project managers make better decisions. Expanding integration with more project management tools like Jira and Trello will streamline workflows,  Additionally, a user feedback loop will help the AI learn and improve over time, and implementing voice and natural language input will make the system more accessible and user-friendly.
 
+## Model API Endpoint
+
+curl -X POST -F "file=@/path/to/srs.pdf" -F "mode=estimate/guide" [http://localhost:5000/analyze](https://esti-req-gen-ai-model-git-suneetha123-dev.apps.cluster.intel.sandbox1234.opentlc.com/analyze)
+
 ## Getting started
 
 ## Setup
