@@ -45,7 +45,7 @@ The idea is to create an AI-powered tool that provides quick time estimates and 
 
 ## What Next ?
 
-In the future, we could upgrade the model to help prioritize tasks based on their urgency and complexity, allowing teams to focus on the most important aspects of the project. The tool would also continuously improve by learning from project data and feedback, providing more accurate estimates and smarter suggestions. As it evolves, the tool could become a central part of project management, streamlining workflows, improving collaboration, and reducing delays to ensure timely delivery of projects.
+The future scope of the solution includes enhancing AI models for more accurate task estimation and analysis, enabling automated task prioritization to help project managers make better decisions. Expanding integration with more project management tools like Jira and Trello will streamline workflows,  Additionally, a user feedback loop will help the AI learn and improve over time, and implementing voice and natural language input will make the system more accessible and user-friendly.
 
 ## Getting started
 
