@@ -49,7 +49,7 @@ The future scope of the solution includes enhancing AI models for more accurate 
 
 ## Model API Endpoint
 
-curl -X POST -F "file=@/path/to/srs.pdf" -F "mode=estimate/guide" [http://localhost:5000/analyze](https://esti-req-gen-ai-model-git-suneetha123-dev.apps.cluster.intel.sandbox1234.opentlc.com/analyze)
+curl -X POST -F "file=@/path/to/srs.pdf" -F "mode=estimate/guide" [https://esti-req-gen-ai-model-git-suneetha123-dev.apps.cluster.intel.sandbox1234.opentlc.com/analyze ](https://esti-req-gen-ai-model-git-suneetha123-dev.apps.cluster.intel.sandbox1234.opentlc.com/analyze)
 
 ## Getting started
 
