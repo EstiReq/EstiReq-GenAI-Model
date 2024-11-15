@@ -7,16 +7,6 @@ Moreover, tight deadlines add pressure, making it challenging to maintain qualit
 
 [![License](https://img.shields.io/badge/License-Apache2-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 
-## Contents
-
-1. [Short description](#short-description)
-1. [Demo video](#demo-video)
-1. [Long description](#long-description)
-1. [Project roadmap](#project-roadmap)
-1. [Getting started](#getting-started)
-1. [Authors](#authors)
-1. [License](#license)
-
 ## Short description
 The idea is to use AI to help software development teams quickly estimate the time required for tasks and provide clear, step-by-step guides for building them. This aims to reduce the time spent on planning and improve efficiency, allowing teams to focus on execution and meet tight deadlines with clearer instructions and better time management.
 
